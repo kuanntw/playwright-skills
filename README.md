@@ -39,6 +39,7 @@ npm run readonly:run
 - `npm run readonly:test:contract` - contract layer only.
 - `npm run readonly:report` - open HTML report.
 - `npm run readonly:housekeeping` - remove old artifacts.
+- `npm run readonly:finalize-report` - aggregate page performance metrics into markdown/json summary.
 
 ## Runtime defaults
 - Concurrent workers: **3**.
@@ -47,6 +48,12 @@ npm run readonly:run
 - Reporters: list + HTML + JSON.
 
 > Trace Viewer includes a full event timeline (network/actions/DOM snapshots), and videos are stored in Playwright output artifacts.
+
+## Performance breakdown in report
+- `artifacts/readonly-report/perf-summary.md` lists the slowest pages in two distinct categories:
+  1) **Slowest First Response (TTFB)**: backend/network first-byte latency.
+  2) **Slowest Overall Render (domComplete)**: end-to-end client render completion latency.
+- Raw per-page samples are stored in `perf-metrics.json` (and `perf-metrics.ndjson` as collection source).
 
 ## Housekeeping policy
 - Default retention: **7 days** for `artifacts/readonly-output` and `artifacts/readonly-report`.

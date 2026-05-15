@@ -16,4 +16,5 @@ function run(command, args) {
 (async () => {
   await run('npm', ['run', 'readonly:housekeeping']);
   await run('npx', ['playwright', 'test', '-c', 'playwright.readonly.config.ts']);
+  await run('npm', ['run', 'readonly:finalize-report']);
 })();

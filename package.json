@@ -1,0 +1,18 @@
+{
+  "name": "playwright-readonly-skills",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "readonly:test": "npx playwright test -c playwright.readonly.config.ts",
+    "readonly:test:smoke": "npx playwright test -c playwright.readonly.config.ts tests/readonly/smoke",
+    "readonly:test:read-model": "npx playwright test -c playwright.readonly.config.ts tests/readonly/read-model",
+    "readonly:test:contract": "npx playwright test -c playwright.readonly.config.ts tests/readonly/contract",
+    "readonly:report": "npx playwright show-report artifacts/readonly-report",
+    "readonly:housekeeping": "node scripts/readonly-housekeeping.mjs",
+    "readonly:run": "node scripts/readonly-runner.mjs",
+    "readonly:finalize-report": "node scripts/readonly-finalize-report.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1"
+  }
+}

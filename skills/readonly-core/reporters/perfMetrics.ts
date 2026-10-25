@@ -13,45 +13,36 @@ export type PagePerfMetric = {
 };
 
 const PERF_DIR = 'artifacts/readonly-report';
-const PERF_NDJSON = path.join(PERF_DIR, 'perf-metrics.ndjson');
+const PERF_NDJSON = path.join('artifacts/readonly-output', 'perf-metrics.ndjson');
 const PERF_JSON = path.join(PERF_DIR, 'perf-metrics.json');
 const PERF_MD = path.join(PERF_DIR, 'perf-summary.md');
 
 export async function capturePagePerf(page: Page, testInfo: TestInfo, url: string): Promise<PagePerfMetric> {
-  const nav = page.mainFrame().navigationResponse();
-  let ttfbMs: number | null = null;
-
-  if (nav) {
-    const timing = nav.timing();
-    if (typeof timing?.responseStart === 'number' && timing.responseStart >= 0) {
-      ttfbMs = timing.responseStart;
-    }
-  }
-
   const perf = await page.evaluate(() => {
     const [entry] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
     if (!entry) {
-      return { domContentLoadedMs: null, loadMs: null, overallRenderMs: null };
+      return { ttfbMs: null, domContentLoadedMs: null, loadMs: null, overallRenderMs: null };
     }
 
     const domContentLoadedMs = entry.domContentLoadedEventEnd > 0 ? entry.domContentLoadedEventEnd : null;
     const loadMs = entry.loadEventEnd > 0 ? entry.loadEventEnd : null;
     const overallRenderMs = entry.domComplete > 0 ? entry.domComplete : null;
 
-    return { domContentLoadedMs, loadMs, overallRenderMs };
+    // Navigation-relative first-byte timing, using the standard browser API.
+    const ttfbMs = entry.responseStart > 0 ? entry.responseStart - entry.startTime : null;
+    return { ttfbMs, domContentLoadedMs, loadMs, overallRenderMs };
   });
 
   return {
     testTitle: testInfo.title,
     url,
-    ttfbMs,
     ...perf,
     capturedAt: new Date().toISOString(),
   };
 }
 
 export async function appendPerfMetric(metric: PagePerfMetric): Promise<void> {
-  await fs.mkdir(PERF_DIR, { recursive: true });
+  await fs.mkdir(path.dirname(PERF_NDJSON), { recursive: true });
   await fs.appendFile(PERF_NDJSON, `${JSON.stringify(metric)}\n`);
 }
 

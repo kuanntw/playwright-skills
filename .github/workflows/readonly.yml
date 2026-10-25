@@ -5,39 +5,27 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  smoke:
+  local_regression:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npm run readonly:housekeeping
-      - run: npm run readonly:test:smoke
-
-  read_model:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - run: npx playwright install --with-deps chromium
+      # Only isolated loopback mock servers, never user accounts or live services.
+      - run: npm test
+      - name: Preserve reports even when tests fail
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          node-version: 20
-      - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npm run readonly:housekeeping
-      - run: npm run readonly:test:read-model
-
-  contract:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npm run readonly:housekeeping
-      - run: npm run readonly:test:contract
+          name: readonly-results
+          path: artifacts/
+          retention-days: 7
+          if-no-files-found: warn

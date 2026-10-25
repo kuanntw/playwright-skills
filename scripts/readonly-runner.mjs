@@ -15,6 +15,10 @@ function run(command, args) {
 
 (async () => {
   await run('npm', ['run', 'readonly:housekeeping']);
-  await run('npx', ['playwright', 'test', '-c', 'playwright.readonly.config.ts']);
-  await run('npm', ['run', 'readonly:finalize-report']);
+  try {
+    await run(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '-c', process.argv[2] || 'playwright.readonly.config.ts']);
+  } finally {
+    // Preserve the failing test status while still producing diagnostic artifacts.
+    await run('npm', ['run', 'readonly:finalize-report']);
+  }
 })();

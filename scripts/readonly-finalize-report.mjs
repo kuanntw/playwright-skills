@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 const PERF_DIR = 'artifacts/readonly-report';
-const PERF_NDJSON = path.join(PERF_DIR, 'perf-metrics.ndjson');
+const PERF_NDJSON = path.join('artifacts/readonly-output', 'perf-metrics.ndjson');
 const PERF_JSON = path.join(PERF_DIR, 'perf-metrics.json');
 const PERF_MD = path.join(PERF_DIR, 'perf-summary.md');
 
